@@ -15,15 +15,15 @@ SoftwareSerial Serial1(2, 3); // RX, TX
 int tmp = 0; // Aanlog 0번
 
 
-char ssid[] = "AndroidHotspot2331";            // your network SSID (name)
+char ssid[] = "SSID Name";            // your network SSID (name)
 
-char pass[] = "12341006";        // your network password
+char pass[] = "Password";        // your network password
 
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 
 
-char server[] = "155.230.25.126";
+char server[] = "Server IP";
 
 
 
@@ -102,12 +102,12 @@ void loop()
 {
   int reading = analogRead(tmp);
 
-  float voltage = reading *5.0 / 1024.0;
-  float temperature = voltage *100;
+  float voltage = reading *5.0 / 1024.0; // mv로 들어오는 입력을
+  float temperature = voltage *100; // 온도로 변환하는 과정
 
   
   Serial.println(temperature);
-  if(temperature >=10){
+  if(temperature >=25){ // '25' 이상 감지 시 서버에 연결, GET 함수 보냄
     
     if (client.connect(server, 11066)) {
   
@@ -117,14 +117,14 @@ void loop()
   
       client.println("GET /fire/1 HTTP/1.1");
   
-      client.println("Host:155.230.25.126");
+      client.println("Host:" + server);
   
       client.println("Connection: close");
   
       client.println();
 
-      client.flush();
-      client.stop();
+      client.flush(); // ** 꼭필요
+      client.stop(); // client와 연결을 끊지 않으면 여러가지 문제 
       delay(10000);
       while(true);
     }
