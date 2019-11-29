@@ -13,14 +13,14 @@ int motorA1 = 6;
 int motorA2 = 7;
 int cnt = 0;
 
-char ssid[] = "bbb";            // your network SSID (name)
-char pass[] = "32624269";        // your network password
+char ssid[] = "SSID name";            // your network SSID (name)
+char pass[] = "Password";        // your network password
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
-char server[] = "155.230.25.126";
+char server[] = "Server IP";
 
 WiFiEspClient client;
 
-int connectServer(String s){ //155.230.25.126:11066/arduino?sqltype1=findvalue&table1=dduk&where1=dduk&value1=1&time=010105
+int connectServer(String s){ 
   int fire = 0;
   
   if (client.connect(server, 11066)) {
@@ -29,17 +29,17 @@ int connectServer(String s){ //155.230.25.126:11066/arduino?sqltype1=findvalue&t
       
       // Make a HTTP request
       client.println("GET /" + s + " HTTP/1.1");
-      client.println("Host: 155.230.25.126");
+      client.println("Host: " + server);
       client.println("Connection: close");
       client.println();
 
       int i = 0;
       int j = 0;
       
-      while (client.available()) { // 서버 응답중 y or n 찾는 반복문 ( 바뀐 응답 확인해야함 )
+      while (client.available()) { // 서버 응답중 y or n 찾는 반복문
         String line = client.readStringUntil('\r');
         
-        if(i == 4){ 
+        if(i == 4){ // 4번째 line에 원하는 응답 포함됨
 
         Serial.println(line[1]);
 
@@ -58,17 +58,17 @@ int connectServer(String s){ //155.230.25.126:11066/arduino?sqltype1=findvalue&t
 }
 
 
-void openDoor(int m1, int m2,int n){
+void openDoor(int m1, int m2,int n){ // 모터제어를 통한 자동문 개방
   analogWrite(m1,140);
   digitalWrite(m2,LOW);
 }
 
-void closeDoor(int m1,int m2,int n){
+void closeDoor(int m1,int m2,int n){ // 닫힘
   digitalWrite(m1,LOW);
   digitalWrite(m2,1);
 }
 
-void holdo(int m1,int m2, int t){
+void holdo(int m1,int m2, int t){ // 
   digitalWrite(m1,LOW);
   digitalWrite(m2,LOW);
   delay(t);
@@ -116,7 +116,7 @@ void loop()
   int yes;
   
   if(var == HIGH){
-    Serial.println("detected"); //arduino?sqltype1=findvalue&table1=dduk&where1=dduk&value1=1&time=010105
+    Serial.println("detected");
     open = 'y';
     if(connectServer("arduino?sqltype1=findvalue_rtc&table1=seoul") == 1){
       open = 'f';
@@ -146,8 +146,6 @@ void loop()
         closeDoor(motorA2,motorA1,cnt);
         cnt--; delay(25);
         Serial.println(cnt);
-        //var = digitalRead(sensor); //닫으면서 중간에 확인요
-        //if(var == HIGH) break;
       }
       open = 'y';
   }else if(open == 'f'){
